@@ -1,5 +1,5 @@
 const express = require('express');
-const User = require('../models/user.js');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -8,25 +8,24 @@ const router = express.Router();
 // Signup
 router.post('/signup', async (req, res) => {
     console.log('User Signed Up', req.body)
-    const { name, email, password, isChef } = req.body;
+    const { name, email, password , isChef } = req.body;
     try {
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ msg: 'User already exists' });
 
-        user = new User({ name, email, password, isChef });
+        user = new User({ name, email, password ,isChef });
         await user.save();
-
+        
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token, user });
     } catch (err) {
-        console.log('Error', err)
-        res.status(500).json({ msg: 'Server error', err: err });
+        res.status(500).json({ msg: 'Server error' });
     }
 });
 
 // Login
 router.post('/login', async (req, res) => {
-    console.log('Login Request', req.body)
+    console.log('Login Request' , req.body)
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
